@@ -65,7 +65,7 @@ class Scanner {
                 addToken(STAR);
                 break;
             case '!':
-                addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+                addToken(match('=') ? BANG_EQUAL : BANG);
                 break;
             case '=':
                 addToken(match('=') ? EQUAL_EQUAL : EQUAL);
