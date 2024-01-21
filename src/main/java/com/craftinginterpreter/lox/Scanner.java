@@ -184,6 +184,7 @@ class Scanner {
         addToken(STRING, value);
     }
 
+    // regex: [0-9]
     private boolean isDigit(char c) {
         return c >= '0' && c <= '9';
     }
@@ -223,10 +224,12 @@ class Scanner {
         addToken(type);
     }
 
+    // [A-Za-z_]
     private boolean isAlpha(char c) {
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
     }
 
+    // [A-Za-z_] | [0-9]
     private boolean isAlphaNumeric(char c) {
         return isAlpha(c) || isDigit(c);
     }
