@@ -1,1 +1,19 @@
-3 * 2 - 4 + 10 - 4 - 3 / 2 
+var a = "global a";
+var b = "global b";
+var c = "global c";
+{
+  var a = a + " outer";
+  var b = "outer b";
+  {
+    var a = "inner a";
+    print a;
+    print b;
+    print c;
+  }
+  print a;
+  print b;
+  print c;
+}
+print a;
+print b;
+print c;
