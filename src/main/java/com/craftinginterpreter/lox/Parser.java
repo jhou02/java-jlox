@@ -1,5 +1,6 @@
 package com.craftinginterpreter.lox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.craftinginterpreter.lox.TokenType.*;
@@ -16,16 +17,74 @@ class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
-        try {
-            return expression();
-        } catch (ParseError error) {
-            return null;
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()) {
+            statements.add(statement());
         }
+
+        return statements;
+    }
+
+    private Stmt declaration() {
+        if (match(VAR)) {
+            return varDeclaration();
+        }
+
+        return statement();
+    }
+
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "expect variable name");
+
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after variable declaration");
+        return new Stmt.Var(name, initializer);
+    }
+
+    private Stmt statement() {
+        if (match(PRINT)) {
+            return printStatement();
+        }
+
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+        Expr expression = expression();
+        consume(SEMICOLON, "expect ; after value");
+
+        return new Stmt.Print(expression);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expression = expression();
+        consume(SEMICOLON, "expect ; after expression statement");
+
+        return new Stmt.Expression(expression);
     }
 
     private Expr expression() {
-        return equality();
+        return assignment();
+    }
+
+    private Expr assignment() {
+        //TODO
+        if (match(IDENTIFIER)) {
+            Token name = previous();
+            consume(EQUAL, "expect = after variable name");
+            Expr value = assignment();
+
+            return new Expr.Assign(name, value);
+        }
+
+        Expr expression = equality();
+
+        return expression;
     }
 
     private Expr equality() {
@@ -99,6 +158,10 @@ class Parser {
 
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
         }
 
         if (match(LEFT_PAREN)) {
